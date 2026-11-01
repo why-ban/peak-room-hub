@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Room Hub mock</title>
+<style>
+:root{
+  --paper:rgb(223,218,194); --tan:rgb(192,172,141); --divider:rgb(87,76,62);
+  --card-fill:rgba(27,19,14,.96); --wood-mid:rgb(144,115,84); --wood-dark:rgb(115,90,63);
+  --wood-light:rgb(200,163,122); --chip-bg:rgb(91,69,63); --gold:rgb(255,204,0);
+  --primary-p:rgb(168,71,15);  --primary-b:rgb(224,111,0);
+  --danger-p:rgb(132,33,44);   --danger-b:rgb(190,52,0);
+  --success-p:rgb(36,75,30);   --success-b:rgb(13,111,29);
+  --info-p:rgb(15,92,168);     --info-b:rgb(0,132,224);
+  --accent-p:rgb(100,47,159);  --accent-b:rgb(142,32,217);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;font-family:"Microsoft YaHei","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+body{background:#161009}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.8667)}
+.scrim::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 38%, rgba(150,85,25,.22), rgba(0,0,0,0) 62%)}
+.card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(1440px, calc(100% - 140px));height:min(840px, calc(100% - 140px));
+  border-radius:16px;background:var(--card-fill);
+  box-shadow:0 12px 0 rgba(0,0,0,.20), 0 30px 70px rgba(0,0,0,.60), inset 0 1px 0 rgba(255,255,255,.05);
+  border:2px solid rgba(192,172,141,.28);display:flex;flex-direction:column;overflow:hidden}
+
+.hd{height:114px;padding:0 36px;display:flex;align-items:center;gap:18px;flex:0 0 auto}
+.hd .titles{display:flex;flex-direction:column;gap:3px;min-width:0}
+.hd h1{font-size:36px;line-height:1;color:var(--paper);font-weight:800;letter-spacing:.5px}
+.hd .sub{font-size:18px;color:rgba(223,218,194,.55);letter-spacing:.3px}
+.hd .grow{flex:1}
+.rule{height:3px;margin:0 36px;background:linear-gradient(90deg,rgba(87,76,62,1),rgba(87,76,62,.15));border-radius:2px;flex:0 0 auto}
+
+.tabs{height:92px;padding:16px 36px 0;display:flex;align-items:center;gap:12px;flex:0 0 auto}
+.tab{height:67px;min-width:180px;padding:0 26px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:700;color:rgba(223,218,194,.72);background:var(--wood-dark);
+  border-top:3px solid rgba(255,255,255,.07);border-bottom:4px solid rgba(0,0,0,.30);white-space:nowrap}
+.tab.on{background:var(--primary-p);border-top-color:var(--primary-b);border-bottom-color:rgba(0,0,0,.38);color:#fff;
+  box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.tab .n{margin-left:10px;font-size:19px;font-weight:700;opacity:.72}
+.search{margin-left:auto;display:flex;align-items:center;gap:10px}
+.field{width:320px;height:67px;border-radius:10px;background:rgba(0,0,0,.46);
+  border:2px solid rgba(192,172,141,.20);display:flex;align-items:center;padding:0 18px;
+  color:rgba(223,218,194,.40);font-size:20px}
+
+.body{flex:1;min-height:0;padding:20px 36px 0}
+.scroll{height:100%;overflow:hidden;display:flex;flex-direction:column;gap:12px}
+
+.btn{position:relative;height:66px;padding:0 26px;border-radius:11px;display:inline-flex;align-items:center;
+  justify-content:center;font-size:24px;font-weight:700;color:#fff;background:var(--p);
+  box-shadow:0 5px 0 rgba(0,0,0,.2667);white-space:nowrap}
+.btn::before,.btn::after{content:"";position:absolute;left:12px;right:12px;height:7px;border-radius:4px;background:var(--b)}
+.btn::before{top:12px}
+.btn::after{bottom:12px}
+.btn>*{position:relative;z-index:1}
+.btn.sm{height:58px;font-size:21px;padding:0 20px}
+.btn.sm::before,.btn.sm::after{left:10px;right:10px;height:6px}
+.btn.sm::before{top:10px}
+.btn.sm::after{bottom:10px}
+.btn.primary{--p:var(--primary-p);--b:var(--primary-b)}
+.btn.success{--p:var(--success-p);--b:var(--success-b)}
+.btn.info{--p:var(--info-p);--b:var(--info-b)}
+.btn.danger{--p:var(--danger-p);--b:var(--danger-b)}
+.btn.accent{--p:var(--accent-p);--b:var(--accent-b)}
+.btn.ghost{--p:var(--wood-dark);--b:rgba(255,255,255,.09);box-shadow:0 5px 0 rgba(0,0,0,.16)}
+.btn.off{--p:rgba(78,68,58,.9);--b:rgba(255,255,255,.05);color:rgba(255,255,255,.38);box-shadow:0 5px 0 rgba(0,0,0,.12)}
+
+.row{position:relative;display:flex;align-items:center;gap:20px;height:96px;padding:0 20px;border-radius:13px;
+  background:rgba(14,10,8,.72);border:2px solid rgba(192,172,141,.12)}
+.row.hover{background:rgba(0,0,0,.46);border-color:rgba(192,172,141,.32)}
+.row.del{background:rgba(96,22,26,.42);border-color:rgba(190,52,0,.42)}
+.row .av{width:64px;height:64px;border-radius:10px;flex:0 0 auto;background:var(--chip-bg);
+  display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;
+  color:rgba(223,218,194,.82);border:2px solid rgba(192,172,141,.20);overflow:hidden}
+.row .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.row .l1{display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700;color:var(--paper);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .l2{display:flex;align-items:center;gap:12px;font-size:18px;color:rgba(223,218,194,.58);white-space:nowrap}
+.row .acts{display:flex;gap:12px;flex:0 0 auto}
+.sep{width:1px;height:22px;background:rgba(192,172,141,.25)}
+.chip{height:30px;padding:0 12px;border-radius:9px;display:inline-flex;align-items:center;
+  font-size:16px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.chip.host{background:rgba(255,204,0,.15);color:var(--gold);border:1px solid rgba(255,204,0,.34)}
+.chip.friend{background:rgba(0,132,224,.15);color:rgb(122,198,255);border:1px solid rgba(0,132,224,.36)}
+.chip.live{background:rgba(13,111,29,.20);color:rgb(130,222,124);border:1px solid rgba(13,111,29,.48)}
+.chip.mute{background:rgba(192,172,141,.09);color:rgba(223,218,194,.52);border:1px solid rgba(192,172,141,.20)}
+.dot{width:10px;height:10px;border-radius:50%;background:rgb(130,222,124);box-shadow:0 0 10px rgba(130,222,124,.85);flex:0 0 auto}
+
+.ft{height:96px;padding:0 36px;display:flex;align-items:center;gap:18px;flex:0 0 auto}
+.ft .hint{font-size:16px;color:rgba(223,218,194,.55);display:flex;align-items:center;gap:6px}
+.ft .grow{flex:1}
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 9px;
+  border-radius:7px;background:rgba(0,0,0,.55);border:1px solid rgba(192,172,141,.26);
+  font-size:16px;font-weight:700;color:var(--paper)}
+
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.empty .big{font-size:24px;font-weight:700;color:rgba(223,218,194,.60)}
+.empty .sm{font-size:18px;color:rgba(223,218,194,.55)}
+
+.cols{display:flex;gap:22px;height:100%}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+.rail{width:392px;flex:0 0 auto;display:flex;flex-direction:column;gap:12px;
+  border-left:3px solid rgba(87,76,62,.5);padding-left:22px}
+.rail h2{font-size:22px;color:var(--gold);font-weight:800;padding:4px 2px 6px;letter-spacing:.4px}
+.banner{height:60px;border-radius:10px;background:rgba(132,33,44,.30);border:2px solid rgba(190,52,0,.45);
+  display:flex;align-items:center;padding:0 20px;font-size:20px;font-weight:700;color:rgb(255,180,150)}
+</style>
+</head>
+<body>
+<div class="scrim"></div>
+<div class="card" id="card"></div>
+<script>
+var rooms=[
+ {host:"星野 あかり",ago:"3 分钟前",players:4,join:true},
+ {host:"Kestrel",ago:"2 小时前",players:3,join:true},
+ {host:"老王",ago:"昨天",players:4,join:false},
+ {host:"Mireille",ago:"3 天前",players:2,join:false}
+];
+var players=[
+ {name:"星野 あかり",ago:"3 分钟前",room:"星野 あかり的房间",host:true,friend:false},
+ {name:"Kestrel",ago:"2 小时前",room:"星野 あかり的房间",host:false,friend:true},
+ {name:"老王",ago:"昨天",room:"Kestrel的房间",host:false,friend:false}
+];
+var friends=[
+ {name:"Kestrel",status:"在游戏中 · 阿尔卑斯",kind:"live",action:"join"},
+ {name:"Mireille",status:"在主菜单中",kind:"mute",action:"invite"},
+ {name:"Tove",status:"仅邀请",kind:"mute",action:null},
+ {name:"Sable",status:"状态未知",kind:"mute",action:null}
+];
+var q=new URLSearchParams(location.search);
+var variant=q.get("variant")||"A";
+var state=q.get("state")||"rooms";
+var W=parseInt(q.get("w")||"1920",10), H=parseInt(q.get("h")||"1080",10);
+if(W!==1920||H!==1080){document.documentElement.style.width=W+"px";document.documentElement.style.height=H+"px";document.body.style.width=W+"px";document.body.style.height=H+"px";}
+
+function btn(label,cls,sm){return '<div class="btn '+(cls||'')+' '+(sm?'sm':'')+'"><span>'+label+'</span></div>';}
+function roomRow(r,del){
+  var acts=del?btn("删除","danger sm",true):(r.join?btn("加入","success sm",true):"")+btn("查看","info sm",true);
+  return '<div class="row'+(del?' del':'')+'"><div class="av">'+r.host.charAt(0)+'</div>'+
+   '<div class="txt"><div class="l1">'+r.host+' 的房间</div>'+
+   '<div class="l2"><span>'+r.ago+'加入</span><span class="sep"></span><span>遇见 '+r.players+' 人</span></div></div>'+
+   '<div class="acts">'+acts+'</div></div>';
+}
+function playerRow(p){
+  var chips=(p.host?'<span class="chip host">房主</span>':'')+(p.friend?'<span class="chip friend">好友</span>':'');
+  return '<div class="row"><div class="av">'+p.name.charAt(0)+'</div>'+
+   '<div class="txt"><div class="l1">'+p.name+chips+'</div>'+
+   '<div class="l2"><span>'+p.ago+'遇见</span><span class="sep"></span><span>房间：'+p.room+'</span></div></div>'+
+   '<div class="acts">'+btn("邀请","success sm",true)+btn("加好友","ghost sm",true)+'</div></div>';
+}
+function friendRow(f){
+  var act=f.action==="join"?btn("加入","success sm",true)
+        :f.action==="invite"?btn("邀请","success sm",true)
+        :'<span class="chip '+(f.kind==='live'?'live':'mute')+'">'+f.status+'</span>';
+  var dot=f.kind==='live'?'<span class="dot"></span>':'';
+  return '<div class="row"><div class="av">'+f.name.charAt(0)+'</div>'+
+   '<div class="txt"><div class="l1">'+f.name+'</div>'+
+   '<div class="l2">'+dot+'<span>'+f.status+'</span></div></div>'+
+   '<div class="acts">'+act+'</div></div>';
+}
+function content(){
+  if(state==="empty")return '<div class="empty"><div class="big">还没有房间记录</div><div class="sm">加入一个多人房间，它就会出现在这里</div></div>';
+  if(state==="delete")return '<div class="banner" style="margin-bottom:2px">删除模式 · 点击房间即可从历史中移除</div>'+rooms.map(function(r){return roomRow(r,true);}).join("");
+  if(state==="players")return players.map(playerRow).join("");
+  if(state==="friends")return friends.map(friendRow).join("");
+  return rooms.map(function(r){return roomRow(r,false);}).join("");
+}
+function header(){
+  return '<div class="hd"><div class="titles"><h1>房间中心</h1>'+
+   '<div class="sub">ROOM HUB · 遇见过的房间与玩家</div></div><div class="grow"></div>'+
+   '<span class="chip mute">共 '+rooms.length+' 个房间 · '+friends.length+' 位好友在线</span></div><div class="rule"></div>';
+}
+function tabs(noFriends){
+  function t(label,n,on){return '<div class="tab '+(on?'on':'')+'">'+label+(n!==null?'<span class="n">'+n+'</span>':'')+'</div>';}
+  var ft=(state==='friends')&&!noFriends;
+  return '<div class="tabs">'+
+   t("房间",rooms.length,state!=='players'&&state!=='friends')+
+   t("玩家",null,state==='players')+
+   (noFriends?"":t("好友",friends.length,ft))+
+   '<div class="search"><div class="field">搜索玩家名…</div>'+btn("搜索","ghost sm",true)+'</div></div>';
+}
+function footer(){
+  var hint=state==='delete'?'<span class="kbd">Esc</span> 退出删除模式'
+   :'<span class="kbd">Esc</span> 返回 <span class="kbd">双击</span> 房间直接加入';
+  var del=(state==='rooms'||state==='empty')?btn("删除模式","ghost sm",true):"";
+  return '<div class="ft"><div class="hint">'+hint+'</div><div class="grow"></div>'+del+btn("关闭","primary sm",true)+'</div>';
+}
+function build(){
+  if(variant==="B"){
+    return header()+'<div class="body"><div class="cols">'+
+      '<div class="main">'+tabs(true)+'<div class="scroll">'+content()+'</div></div>'+
+      '<div class="rail"><h2>STEAM 好友 · '+friends.length+'</h2><div class="scroll">'+friends.map(friendRow).join("")+'</div></div>'+
+      '</div></div>'+footer();
+  }
+  return header()+tabs(false)+'<div class="body"><div class="scroll">'+content()+'</div></div>'+footer();
+}
+document.getElementById("card").innerHTML=build();
+</script>
+</body>
+</html>

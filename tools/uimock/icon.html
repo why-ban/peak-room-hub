@@ -1,0 +1,35 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;width:512px;height:512px;overflow:hidden;background:#000}
+  .stage{position:relative;width:512px;height:512px;
+    background:radial-gradient(120% 110% at 50% 0%, #F7B267 0%, #E07A22 46%, #B85410 100%);}
+
+  .card{position:absolute;left:22px;top:22px;width:468px;height:468px;border-radius:62px;
+    background:linear-gradient(180deg, #E8E2CB 0%, #DCD5BB 100%);
+    box-shadow:0 14px 0 rgba(90,45,10,.35), 0 22px 44px rgba(60,28,6,.45), inset 0 0 0 4px rgba(255,255,255,.35);}
+
+  .door{position:absolute;left:50%;top:88px;width:124px;height:162px;transform:translateX(-50%);
+    border-radius:62px 62px 12px 12px;background:#3A2A1E;box-shadow:0 8px 0 rgba(90,45,10,.30);}
+  .inner{position:absolute;left:15px;top:35px;right:15px;bottom:12px;
+    border-radius:47px 47px 6px 6px;background:#1A120C;overflow:hidden;}
+  .light{position:absolute;left:0;right:0;bottom:-30px;height:98px;
+    background:radial-gradient(60% 100% at 50% 100%, rgba(255,170,60,1), rgba(255,170,60,0) 72%);}
+  .floor{position:absolute;left:0;right:0;bottom:0;height:10px;background:rgba(255,150,40,.75);}
+
+  .en{position:absolute;left:0;right:0;top:280px;text-align:center;
+    font-family:"Segoe UI Black","Segoe UI",sans-serif;font-weight:900;font-size:66px;line-height:1;
+    color:#2A1D15;}
+  .zh{position:absolute;left:0;right:0;top:364px;text-align:center;
+    font-family:"Microsoft YaHei","Microsoft YaHei UI",sans-serif;font-weight:700;font-size:46px;line-height:1;
+    letter-spacing:10px;text-indent:10px;color:#B85410;}
+</style></head>
+<body><div class="stage">
+  <div class="card">
+    <div class="door">
+      <div class="inner"><div class="light"></div><div class="floor"></div></div>
+    </div>
+    <div class="en">ROOM HUB</div>
+    <div class="zh">房间中心</div>
+  </div>
+</div></body></html>

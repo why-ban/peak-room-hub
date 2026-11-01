@@ -1,0 +1,26 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+build/
+*.user
+*.suo
+.vs/
+*.pdb
+
+# Reverse-engineering material and game binaries: never published
+decompiled/
+refs/
+PEAKLobbyBrowser.dll
+
+# UI mock harness: dependencies and rendered previews
+tools/uimock/node_modules/
+tools/uimock/package-lock.json
+tools/uimock/*.png
+
+# Third-party mod packages kept locally
+dist/EasyBackpack_Fix-*.zip
+dist/Piggyback_Fix-*.zip
+
+# OS
+Thumbs.db
+Desktop.ini

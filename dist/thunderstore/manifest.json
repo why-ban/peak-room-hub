@@ -1,0 +1,11 @@
+{
+  "name": "Room_Hub",
+  "version_number": "3.0.0",
+  "website_url": "https://github.com/why-ban/peak-room-hub",
+  "description": "Rebuilt for PEAK 3.x: a first-party-styled panel with room history, player search, Steam invites, and a live friends rail that shows which biome a friend is in. Gamepad ready. EN/ZH.",
+  "dependencies": [
+    "BepInEx-BepInExPack_PEAK-5.4.2403",
+    "PEAKModding-PEAKLib_Core-1.7.2",
+    "PEAKModding-PEAKLib_UI-1.7.2"
+  ]
+}
