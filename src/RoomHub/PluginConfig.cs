@@ -17,7 +17,6 @@ public sealed class PluginConfig
     public ConfigEntry<bool> UseCustomButtonPos { get; }
     public ConfigEntry<int> MaxRecentRooms { get; }
     public ConfigEntry<int> HistoryExpireHours { get; }
-    public ConfigEntry<bool> RecordWhenHosting { get; }
 
     /// <summary>Hard cap met-players per room (not user-configurable).</summary>
     public const int MaxPlayersPerRoomFixed = 20;
@@ -96,12 +95,7 @@ public sealed class PluginConfig
                 new AcceptableValueRange<int>(1, 720)));
 
         // Max players per room is a fixed constant (MaxPlayersPerRoomFixed = 20), not a config entry
-
-        RecordWhenHosting = config.Bind(
-            "History",
-            "Record When Hosting (主持时也记录房间)",
-            false,
-            "Also record a room entry when you host.\n自己开房是否记入历史。");
+        // Rooms you host are always recorded: adding a stranger you invited is a core use case
     }
 
     /// <summary>Persist a new ribbon position (enables custom pos for next launch).</summary>

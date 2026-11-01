@@ -16,7 +16,7 @@ public sealed class Plugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.roomhub.RoomHub";
     public const string PluginName = "Room Hub";
-    public const string PluginVersion = "3.0.0";
+    public const string PluginVersion = "3.0.1";
 
     internal static Plugin Instance { get; private set; } = null!;
     internal static ManualLogSource Log { get; private set; } = null!;

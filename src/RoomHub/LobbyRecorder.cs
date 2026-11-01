@@ -24,9 +24,7 @@ internal static class SteamLobbyEnterPatch
             if (lobbyId == CSteamID.Nil || param.m_ulSteamIDLobby == 0)
                 return;
 
-            var self = SteamUser.GetSteamID();
             var owner = SteamMatchmaking.GetLobbyOwner(lobbyId);
-            bool isHost = owner == self;
 
             string lobbyKey = lobbyId.m_SteamID.ToString();
 
@@ -37,16 +35,6 @@ internal static class SteamLobbyEnterPatch
             string recordedHost = (existing != null && !string.IsNullOrWhiteSpace(existing.HostSteamId))
                 ? existing.HostSteamId
                 : owner.m_SteamID.ToString();
-
-            if (isHost && !Plugin.ModConfig.RecordWhenHosting.Value)
-            {
-                // No room row, but keep active lobby for Photon tracking / invites context.
-                // Pass the recorded host (creator), not ourselves, because we may have been transferred
-                // ownership of a room that was already recorded under its original creator.
-                Plugin.Log.LogDebug("Skip room list entry (hosting).");
-                PlayerTracker.SetActiveLobby(lobbyKey, recordedHost);
-                return;
-            }
 
             string hostName = ResolveHostName(existing, recordedHost);
             // PEAK publishes only PeakVersion / PhotonRegion / CurrentScene / RunId, so there is

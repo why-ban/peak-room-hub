@@ -22,6 +22,7 @@ Rebuilt from scratch for **PEAK 3.0.1**. Crash-safe, zero-config, EN / 简体中
 
 ### Room history
 - Every lobby you join is saved locally, so a crash or a disconnect never costs you the room.
+- Rooms you host are saved too, always: invite a stranger, then add them as a friend from the room's player list afterwards.
 - Up to **10 recent rooms** (configurable), pruned by age (default 7 days).
 - The room host is frozen to the **creator**; Steam ownership transfers never move the badge.
 - Join, inspect who was there, or delete a room from the panel.
@@ -79,7 +80,6 @@ File: `BepInEx/config/com.roomhub.RoomHub.cfg`, also editable in game with [PEAK
 | Mod Menu Hotkey | K | Title and in-game: toggle the panel |
 | Max Recent Rooms | 10 | Oldest rooms are removed first |
 | History Expire Hours | 168 | 7 days |
-| Record When Hosting | false | Also save rooms you host |
 
 ---
 

@@ -226,8 +226,8 @@ public sealed class HistoryStore
     }
 
     /// <summary>
-    /// Record a met player under an existing room. Does <b>not</b> create a room row
-    /// (avoids RecordWhenHosting=false being bypassed by Photon-only paths).
+    /// Record a met player under an existing room. Does <b>not</b> create a room row: a row only
+    /// ever comes from a real lobby enter, so Photon-only paths cannot invent history entries.
     /// </summary>
     public void UpsertPlayer(string lobbyId, string steamId, string displayName, bool wasHost)
     {
@@ -239,7 +239,7 @@ public sealed class HistoryStore
             var room = _rooms.FirstOrDefault(r => string.Equals(r.LobbyId, lobbyId, StringComparison.Ordinal));
             if (room == null)
             {
-                // Room must come from UpsertRoom. No shell invent, which keeps hosting opt-out intact
+                // Room must come from UpsertRoom, never invented from a player callback
                 return;
             }
 
