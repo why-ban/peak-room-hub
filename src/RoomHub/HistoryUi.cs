@@ -56,12 +56,6 @@ internal static class HistoryUi
 
     public static void Open()
     {
-        if (!Plugin.ModConfig.Enabled.Value)
-        {
-            RoomJoiner.ShowFeedback(Loc.T(Loc.Disabled), Loc.T(Loc.Disabled));
-            return;
-        }
-
         try
         {
             // the hotkey can fire while pause is open, and both UIs must not stack

@@ -71,7 +71,7 @@ public sealed class TitleMenuController : MonoBehaviour
         yield return new WaitForSeconds(PostReadySettleSec);
         yield return null;
 
-        if (!Plugin.ModConfig.Enabled.Value || !Plugin.ModConfig.ShowMainMenuButton.Value)
+        if (!Plugin.ModConfig.ShowMainMenuButton.Value)
             yield break;
         if (GameObject.Find(ButtonObjectName) != null)
             yield break;

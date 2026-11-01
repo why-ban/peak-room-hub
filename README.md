@@ -2,7 +2,7 @@
 
 PEAK BepInEx mod: room history, quick rejoin, player search, Steam invite / add friend, and a live Steam friends rail.
 
-**Version:** 3.1.0 · **Assembly:** `RoomHub.dll` · **GUID:** `com.roomhub.RoomHub` · **Target:** PEAK 3.0.1
+**Version:** 3.1.1 · **Assembly:** `RoomHub.dll` · **GUID:** `com.roomhub.RoomHub` · **Target:** PEAK 3.0.1
 **Repository:** https://github.com/why-ban/peak-room-hub · **License:** MIT
 
 ## What it does
@@ -23,7 +23,7 @@ buttons are the game's own button widget, and rounded surfaces are generated at 
   - `src/RoomHub/Ui/` — panel toolkit and views (design tokens, sprites, buttons, rows, page shell)
 - `docs/` — design and audit documentation
 - `dist/thunderstore/` — Thunderstore package files
-- `dist/RoomHub-3.1.0.zip` — upload-ready package
+- `dist/RoomHub-3.1.1.zip` — upload-ready package
 - `tools/uimock/` — offline HTML mock of the panel plus its Playwright render script
 
 ## Build

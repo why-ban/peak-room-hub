@@ -14,8 +14,6 @@ internal static class SteamLobbyEnterPatch
     {
         try
         {
-            if (!Plugin.ModConfig.Enabled.Value)
-                return;
             if (param.m_EChatRoomEnterResponse
                 != (uint)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
                 return;

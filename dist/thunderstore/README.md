@@ -24,7 +24,7 @@ Rebuilt from scratch for **PEAK 3.0.1**. Crash-safe, zero-config, EN / 简体中
 - Every lobby you join is saved locally, so a crash or a disconnect never costs you the room.
 - Rooms you host are saved too, so you can invite a stranger and add them as a friend afterwards.
 - A room you hosted that never had a second player in it is dropped when you leave, so a solo session does not clutter the list.
-- Up to **10 recent rooms** (configurable), pruned by age (default 7 days).
+- Up to **20 recent rooms** (configurable), pruned by age (default 7 days).
 - The room host is frozen to the **creator**; Steam ownership transfers never move the badge.
 - Join, inspect who was there, or delete a room from the panel.
 
@@ -73,16 +73,20 @@ File: `BepInEx/config/com.roomhub.RoomHub.cfg`, also editable in game with [PEAK
 
 | Setting | Default | Description |
 |---|---|---|
-| Enable Mod | true | Master switch |
 | Show Main Menu Button | true | Title-screen ribbon button |
 | Use Custom Button Position / Pos X/Y | none | Saved automatically when you right-click-drag the ribbon |
 | Enable Hotkey | true | Master switch for both hotkeys |
 | Quick Join Hotkey | J | Title screen: rejoin the most recent room |
 | Mod Menu Hotkey | K | Title and in-game: toggle the panel |
-| Max Recent Rooms | 10 | Oldest rooms are removed first |
+| Max Recent Rooms | 20 | Oldest rooms are removed first |
 | History Expire Hours | 168 | 7 days |
 
 ---
+
+## Upgrading from 3.0.x
+
+- `Enable Mod` is gone. The mod is always on; an old `Enable Mod = false` line left in your `.cfg` is ignored and can be deleted by hand.
+- `Max Recent Rooms` now defaults to **20** for fresh installs. If you already have a `.cfg`, your existing value stays until you change it.
 
 ## FAQ
 

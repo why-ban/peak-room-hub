@@ -29,13 +29,6 @@ public static class RoomJoiner
     /// </summary>
     public static void TryJoinMostRecent(bool showEmptyFeedback)
     {
-        if (!Plugin.ModConfig.Enabled.Value)
-        {
-            if (showEmptyFeedback)
-                ShowModal(Loc.T(Loc.Disabled), "");
-            return;
-        }
-
         var recent = Plugin.Store.GetMostRecent();
         if (recent == null)
         {
@@ -55,9 +48,6 @@ public static class RoomJoiner
 
     public static void TryJoinLobbyId(string lobbyId, bool hidePage)
     {
-        if (!Plugin.ModConfig.Enabled.Value)
-            return;
-
         // The game refuses a lobby join while it is already in a room, and refuses it silently
         if (!HistoryUi.IsTitleScene && InLiveSession())
         {

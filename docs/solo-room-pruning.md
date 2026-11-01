@@ -146,18 +146,18 @@ Pruned 2 solo-hosted room(s): lobbies=109775241234567890, 109775241234567891, ho
 
 `dotnet build "src\RoomHub\RoomHub.csproj"` → 0 错误 0 警告。
 
-## 复审后的最终形态（3.1.0 发布版）
+## 复审后的最终形态（3.1.x 发布版）
 
 复审（`docs/audit/solo-prune-review.md`）发现两条真实误删路径，均已修复：
 
-1. **记录受 `Enabled` 管、删除不受**：`PruneActiveLobbyIfSolo` 与 `Plugin.TryStartupSweep` 现在都在最前面检查
-   `Plugin.ModConfig.Enabled.Value`。关掉模组后既不再取证，也不再判罚。
+1. **记录受 `Enabled` 管、删除不受**：已通过移除总开关根治（3.1.1 起 `Enable Mod` 配置项删除，模组恒为启用）。
+   现在取证与判罚永远对称，不再存在"关掉模组后取证停止、判罚照跑"的状态。
 2. **取证管道未就绪仍会删**：`EnsureRoomEvents()` 移到 `EnsureCallbacks` 的早退之前，失败可重试；
    新增 `PlayerTracker.RecordingArmed`，两个删除入口都要求它为 true。
    即「没有证据」不再被当作「没有玩家」。
 
 配套：
-- 启动清扫失败后按 1 秒节流重试，挂钩异常只记一次 Warning（避免每帧异常刷屏）。
+- 启动清扫失败后按 1 秒节流重试，挂钩异常只记一次 Warning（避免每帧异常刷屏；`Plugin.TryStartupSweep` 的 `_nextSweepAttempt`）。
 - `EnsureRoomEvents` 的重复调用是稳态静态 bool 读，不存在重复订阅。
 
 **已知取舍（有意为之）**：取证管道永久挂不上时，垃圾房不会被清理，会占用 `MaxRecentRooms` 的名额。

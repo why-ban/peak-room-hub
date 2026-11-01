@@ -16,7 +16,7 @@ public sealed class Plugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.roomhub.RoomHub";
     public const string PluginName = "Room Hub";
-    public const string PluginVersion = "3.1.0";
+    public const string PluginVersion = "3.1.1";
 
     internal static Plugin Instance { get; private set; } = null!;
     internal static ManualLogSource Log { get; private set; } = null!;
@@ -136,10 +136,6 @@ public sealed class Plugin : BaseUnityPlugin
     /// </summary>
     private bool TryStartupSweep()
     {
-        // Must mirror the live prune: with the mod off nothing is recorded, so nothing may be judged
-        if (!ModConfig.Enabled.Value)
-            return false;
-
         // Retrying every frame would spam an exception if the room-event hook can never attach
         if (Time.unscaledTime < _nextSweepAttempt)
             return false;
@@ -185,7 +181,7 @@ public sealed class Plugin : BaseUnityPlugin
         try { Store?.TickDeferredSave(Time.unscaledTime); } catch { /* ignore */ }
         PlayerTracker.TickHostPoll(Time.unscaledTime);
 
-        if (!ModConfig.Enabled.Value || !ModConfig.EnableHotkey.Value)
+        if (!ModConfig.EnableHotkey.Value)
             return;
 
         // Don't steal keys while typing in search (or any TMP/UGUI input)
@@ -245,7 +241,7 @@ public sealed class Plugin : BaseUnityPlugin
         if (scene.name != "Title")
             return;
 
-        if (!ModConfig.Enabled.Value || !ModConfig.ShowMainMenuButton.Value)
+        if (!ModConfig.ShowMainMenuButton.Value)
             return;
 
         if (_titleUi == null)

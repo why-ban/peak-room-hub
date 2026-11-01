@@ -24,7 +24,6 @@ public static class Loc
     public const string LobbyName = "ROOMHISTORY_LOBBY_NAME";
     public const string NoRecent = "ROOMHISTORY_NO_RECENT";
     public const string InvalidId = "ROOMHISTORY_INVALID_ID";
-    public const string Disabled = "ROOMHISTORY_DISABLED";
     public const string HintHotkey = "ROOMHISTORY_HINT_HOTKEY";
     public const string HintHotkeyInGame = "ROOMHISTORY_HINT_HOTKEY_INGAME";
     public const string HintJoinView = "ROOMHISTORY_HINT_JOIN_VIEW";
@@ -126,7 +125,6 @@ public static class Loc
         L(LobbyName, "Name: {0}", "名称：{0}", "名稱：{0}");
         L(NoRecent, "No room in history to rejoin.", "暂无最近房间可加入。", "暫無最近房間可加入。");
         L(InvalidId, "Invalid lobby ID in history.", "历史中的房间 ID 无效。", "歷史中的房間 ID 無效。");
-        L(Disabled, "Room Hub is disabled in config.", "房间中心已在配置中关闭。", "房間中心已在設定中關閉。");
         L(HintHotkey, "Quick join [{0}] · Mod menu [{1}] on the title screen",
             "主界面按 [{0}] 快速加入最近房间 · 按 [{1}] 打开房间中心",
             "主介面按 [{0}] 快速加入最近房間 · 按 [{1}] 打開房間中心");

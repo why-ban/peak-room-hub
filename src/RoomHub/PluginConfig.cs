@@ -7,7 +7,6 @@ public sealed class PluginConfig
 {
     private readonly ConfigFile _file;
 
-    public ConfigEntry<bool> Enabled { get; }
     public ConfigEntry<bool> ShowMainMenuButton { get; }
     public ConfigEntry<bool> EnableHotkey { get; }
     public ConfigEntry<KeyCode> QuickJoinHotkey { get; }
@@ -24,12 +23,6 @@ public sealed class PluginConfig
     public PluginConfig(ConfigFile config)
     {
         _file = config;
-
-        Enabled = config.Bind(
-            "General",
-            "Enable Mod (启用模组)",
-            true,
-            "Master switch.\n总开关。");
 
         ShowMainMenuButton = config.Bind(
             "UI",
@@ -81,7 +74,7 @@ public sealed class PluginConfig
         MaxRecentRooms = config.Bind(
             "History",
             "Max Recent Rooms (最多房间数)",
-            10,
+            20,
             new ConfigDescription(
                 "Max rooms kept. When over limit, oldest rooms are removed first.\n最多保留房间数。超出时优先删除最旧的房间。",
                 new AcceptableValueRange<int>(1, 50)));

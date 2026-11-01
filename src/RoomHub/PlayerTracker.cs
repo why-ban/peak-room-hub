@@ -51,10 +51,8 @@ public static class PlayerTracker
     /// </summary>
     public static void PruneActiveLobbyIfSolo()
     {
-        // Deleting is a judgement that nobody ever joined, which is only sound while the same
-        // switch that drives recording is on and the room-event pipeline is actually attached
-        if (!Plugin.ModConfig.Enabled.Value)
-            return;
+        // Deleting is a judgement that nobody ever joined, so it is only sound while the pipeline
+        // that records players is actually attached
         if (!_roomEventsHooked)
         {
             Plugin.Log.LogDebug("Prune skipped: room event pipeline is not attached.");
@@ -144,8 +142,6 @@ public static class PlayerTracker
     {
         try
         {
-            if (!Plugin.ModConfig.Enabled.Value)
-                return;
             var players = PhotonNetwork.PlayerList;
             if (players == null)
                 return;
@@ -167,8 +163,6 @@ public static class PlayerTracker
     {
         try
         {
-            if (!Plugin.ModConfig.Enabled.Value)
-                return;
             if (string.IsNullOrEmpty(_activeLobbyId))
                 return;
             if (!string.Equals(_activeLobbyId, param.m_ulSteamIDLobby.ToString(), StringComparison.Ordinal))
@@ -189,8 +183,6 @@ public static class PlayerTracker
     /// <summary>Slow poll while in lobby, a belt-and-suspenders path if chat updates go quiet.</summary>
     public static void TickHostPoll(float unscaledTime)
     {
-        if (!Plugin.ModConfig.Enabled.Value)
-            return;
         if (string.IsNullOrEmpty(_activeLobbyId))
             return;
         if (unscaledTime - _lastHostPollUnscaled < 5f)
@@ -273,8 +265,6 @@ public static class PlayerTracker
     {
         try
         {
-            if (!Plugin.ModConfig.Enabled.Value)
-                return;
             if (player == null || player.IsLocal)
                 return;
 
@@ -339,8 +329,6 @@ internal static class OnJoinedRoomPatch
     {
         try
         {
-            if (!Plugin.ModConfig.Enabled.Value)
-                return;
 
             var lobbyId = PlayerTracker.EnsureActiveLobbyFromSteam();
             if (!string.IsNullOrEmpty(lobbyId))
@@ -381,8 +369,6 @@ internal static class OnLobbyDataUpdateHostPatch
     {
         try
         {
-            if (!Plugin.ModConfig.Enabled.Value)
-                return;
             PlayerTracker.SyncHostFromSteam();
         }
         catch { /* ignore */ }
