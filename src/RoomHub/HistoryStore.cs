@@ -341,6 +341,76 @@ public sealed class HistoryStore
     }
 
     /// <summary>
+    /// Drop the history row of a room the local player hosted that never saw a second player.
+    /// An empty player list alone proves nothing: a guest's room can have one too.
+    /// </summary>
+    public bool PruneSoloHostedRoom(string? lobbyId, string? localSteamId)
+    {
+        if (string.IsNullOrWhiteSpace(lobbyId))
+            return false;
+
+        var self = (localSteamId ?? "").Trim();
+        if (self.Length == 0)
+            return false;
+
+        bool removed;
+        lock (_lock)
+        {
+            removed = _rooms.RemoveAll(
+                r => string.Equals(r.LobbyId, lobbyId, StringComparison.Ordinal) && IsSoloHostedRoom(r, self)) > 0;
+
+            // A delete, so flush now instead of waiting for the deferred tick
+            if (removed)
+                SaveUnlocked();
+        }
+
+        if (removed)
+            Plugin.Log.LogInfo(
+                $"Pruned solo-hosted room: lobby={lobbyId}, host={self}, reason=no other player was ever recorded");
+
+        return removed;
+    }
+
+    /// <summary>
+    /// Same rule as <see cref="PruneSoloHostedRoom"/>, over every stored room. Startup sweep for
+    /// the runs that crashed before a leave or quit could clean up. Returns the rows dropped.
+    /// </summary>
+    public int PruneSoloHostedRooms(string? localSteamId)
+    {
+        var self = (localSteamId ?? "").Trim();
+        if (self.Length == 0)
+            return 0;
+
+        int removed = 0;
+        string lobbies = "";
+        lock (_lock)
+        {
+            var victims = _rooms.Where(r => IsSoloHostedRoom(r, self)).ToList();
+            if (victims.Count > 0)
+            {
+                removed = _rooms.RemoveAll(victims.Contains);
+                lobbies = string.Join(", ", victims.Select(r => r.LobbyId));
+                SaveUnlocked();
+            }
+        }
+
+        if (removed > 0)
+            Plugin.Log.LogInfo(
+                $"Pruned {removed} solo-hosted room(s): lobbies={lobbies}, host={self}, " +
+                "reason=no other player was ever recorded");
+
+        return removed;
+    }
+
+    private static bool IsSoloHostedRoom(RoomRecord room, string localSteamId)
+    {
+        // An unknown host id must never be read as "mine", so an empty one never matches
+        return !string.IsNullOrEmpty(room.HostSteamId)
+               && string.Equals(room.HostSteamId, localSteamId, StringComparison.Ordinal)
+               && room.Players.Count == 0;
+    }
+
+    /// <summary>
     /// Flush coalesced dirty writes after ~0.75s idle. Call from Plugin.Update.
     /// </summary>
     public void TickDeferredSave(float unscaledTime)

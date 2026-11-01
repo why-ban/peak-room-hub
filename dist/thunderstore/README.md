@@ -22,7 +22,8 @@ Rebuilt from scratch for **PEAK 3.0.1**. Crash-safe, zero-config, EN / 简体中
 
 ### Room history
 - Every lobby you join is saved locally, so a crash or a disconnect never costs you the room.
-- Rooms you host are saved too, always: invite a stranger, then add them as a friend from the room's player list afterwards.
+- Rooms you host are saved too, so you can invite a stranger and add them as a friend afterwards.
+- A room you hosted that never had a second player in it is dropped when you leave, so a solo session does not clutter the list.
 - Up to **10 recent rooms** (configurable), pruned by age (default 7 days).
 - The room host is frozen to the **creator**; Steam ownership transfers never move the badge.
 - Join, inspect who was there, or delete a room from the panel.

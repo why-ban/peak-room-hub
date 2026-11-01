@@ -16,7 +16,7 @@ public sealed class Plugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.roomhub.RoomHub";
     public const string PluginName = "Room Hub";
-    public const string PluginVersion = "3.0.1";
+    public const string PluginVersion = "3.1.0";
 
     internal static Plugin Instance { get; private set; } = null!;
     internal static ManualLogSource Log { get; private set; } = null!;
@@ -25,6 +25,8 @@ public sealed class Plugin : BaseUnityPlugin
 
     private Harmony? _harmony;
     private TitleMenuController? _titleUi;
+    private bool _soloSweepDone;
+    private float _nextSweepAttempt;
 
     private void Awake()
     {
@@ -100,7 +102,7 @@ public sealed class Plugin : BaseUnityPlugin
 
     private void OnDestroy()
     {
-        try { Store?.Flush(); } catch { /* ignore */ }
+        FlushHistoryOnExit();
         SceneManager.sceneLoaded -= OnSceneLoaded;
         HistoryUi.DropPage();
         // A throwing unpatch would skip every Shutdown below it
@@ -115,11 +117,68 @@ public sealed class Plugin : BaseUnityPlugin
 
     private void OnApplicationQuit()
     {
+        FlushHistoryOnExit();
+    }
+
+    /// <summary>
+    /// Quitting does not always raise Photon's OnLeftRoom, so the solo-hosted room has to be
+    /// settled here too. The prune is idempotent, so both exit hooks can call this.
+    /// </summary>
+    private void FlushHistoryOnExit()
+    {
+        try { PlayerTracker.PruneActiveLobbyIfSolo(); } catch { /* ignore */ }
         try { Store?.Flush(); } catch { /* ignore */ }
+    }
+
+    /// <summary>
+    /// One-shot startup sweep for the runs that crashed before a leave or quit could clean up.
+    /// Steam must be ready: an empty local id would compare every host against nothing useful.
+    /// </summary>
+    private bool TryStartupSweep()
+    {
+        // Must mirror the live prune: with the mod off nothing is recorded, so nothing may be judged
+        if (!ModConfig.Enabled.Value)
+            return false;
+
+        // Retrying every frame would spam an exception if the room-event hook can never attach
+        if (Time.unscaledTime < _nextSweepAttempt)
+            return false;
+        _nextSweepAttempt = Time.unscaledTime + 1f;
+
+        var self = SteamAvatarService.LocalSteamIdString();
+        if (string.IsNullOrEmpty(self))
+            return false;
+
+        // Same rule as the live prune: never judge a room without the pipeline that records players
+        PlayerTracker.EnsureRoomEvents();
+        if (!PlayerTracker.RecordingArmed)
+            return false;
+
+        // A live lobby may already be the room being judged, so wait until we are out of one
+        try
+        {
+            if (Peak.Network.NetCode.Matchmaking?.InLobby == true)
+                return false;
+        }
+        catch { /* game API may vary */ }
+
+        try
+        {
+            Store.PruneSoloHostedRooms(self);
+        }
+        catch (Exception ex)
+        {
+            Log.LogDebug($"Startup solo-room sweep failed: {ex.Message}");
+        }
+
+        return true;
     }
 
     private void Update()
     {
+        if (!_soloSweepDone)
+            _soloSweepDone = TryStartupSweep();
+
         HistoryUi.Tick();
         if (!HistoryUi.IsOpen)
             PauseMenuHook.ReleaseHeldTimeScale();

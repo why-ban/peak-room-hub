@@ -17,6 +17,7 @@ public static class PlayerTracker
     private static Callback<LobbyChatUpdate_t>? _lobbyChatUpdate;
     private static bool _callbacksInited;
     private static bool _roomEventsHooked;
+    private static bool _roomEventsFailureLogged;
     private static float _lastHostPollUnscaled;
     private static float _lastChatSyncUnscaled;
 
@@ -26,9 +27,14 @@ public static class PlayerTracker
         // we see for a lobby is treated as its creator; later Steam ownership transfers must
         // not overwrite it (matches HistoryStore's frozen-host rule).
         bool lobbyChanged = !string.Equals(_activeLobbyId, lobbyId, StringComparison.Ordinal);
-        _activeLobbyId = lobbyId;
         if (lobbyChanged)
+        {
+            // Switching rooms can skip the leave callback, so settle the old room while its id is known
+            PruneActiveLobbyIfSolo();
             _activeHostSteamId = hostSteamId;
+        }
+
+        _activeLobbyId = lobbyId;
         EnsureCallbacks();
     }
 
@@ -36,6 +42,41 @@ public static class PlayerTracker
     {
         _activeLobbyId = null;
         _activeHostSteamId = null;
+    }
+
+    /// <summary>
+    /// Drop the active lobby's history row when we hosted it and nobody ever joined. Must run
+    /// before <see cref="ClearActiveLobby"/> because it reads the id. Idempotent: once the row is
+    /// gone the predicate stops matching, so the exit hooks may call it again safely.
+    /// </summary>
+    public static void PruneActiveLobbyIfSolo()
+    {
+        // Deleting is a judgement that nobody ever joined, which is only sound while the same
+        // switch that drives recording is on and the room-event pipeline is actually attached
+        if (!Plugin.ModConfig.Enabled.Value)
+            return;
+        if (!_roomEventsHooked)
+        {
+            Plugin.Log.LogDebug("Prune skipped: room event pipeline is not attached.");
+            return;
+        }
+
+        var lobbyId = _activeLobbyId;
+        if (string.IsNullOrEmpty(lobbyId))
+            return;
+
+        var self = SteamAvatarService.LocalSteamIdString();
+        if (string.IsNullOrEmpty(self))
+            return;
+
+        try
+        {
+            Plugin.Store.PruneSoloHostedRoom(lobbyId, self);
+        }
+        catch (Exception ex)
+        {
+            Plugin.Log.LogWarning($"PruneActiveLobbyIfSolo: {ex.Message}");
+        }
     }
 
     public static void Shutdown()
@@ -55,6 +96,10 @@ public static class PlayerTracker
 
     private static void EnsureCallbacks()
     {
+        // Before the early return: a failed hook has to be retried, because pruning relies on
+        // this pipeline having been attached
+        EnsureRoomEvents();
+
         if (_callbacksInited)
             return;
         try
@@ -66,8 +111,6 @@ public static class PlayerTracker
         {
             Plugin.Log.LogDebug($"LobbyChatUpdate callback init failed: {ex.Message}");
         }
-
-        EnsureRoomEvents();
     }
 
     /// <summary>
@@ -76,7 +119,9 @@ public static class PlayerTracker
     /// below only fires while that HUD object is enabled, so players who join after us would go
     /// unrecorded wherever the HUD is absent. Both paths feed the same SteamId-keyed upsert.
     /// </summary>
-    private static void EnsureRoomEvents()
+    internal static bool RecordingArmed => _roomEventsHooked;
+
+    internal static void EnsureRoomEvents()
     {
         if (_roomEventsHooked)
             return;
@@ -87,7 +132,11 @@ public static class PlayerTracker
         }
         catch (Exception ex)
         {
-            Plugin.Log.LogDebug($"RoomEvents hook failed: {ex.Message}");
+            if (!_roomEventsFailureLogged)
+            {
+                _roomEventsFailureLogged = true;
+                Plugin.Log.LogWarning($"RoomEvents hook failed: {ex.Message}");
+            }
         }
     }
 
@@ -319,6 +368,7 @@ internal static class OnLeftRoomPatch
 {
     private static void Postfix()
     {
+        PlayerTracker.PruneActiveLobbyIfSolo();
         PlayerTracker.ClearActiveLobby();
     }
 }
